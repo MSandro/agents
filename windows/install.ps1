@@ -48,6 +48,8 @@ receivers:
         metrics:
           system.cpu.utilization:
             enabled: true
+          system.cpu.logical.count:
+            enabled: true
       disk:
       filesystem:
         metrics:
