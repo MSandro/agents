@@ -141,6 +141,7 @@ EOL
 # Reload systemd and enable otel-collector service
 systemctl daemon-reload
 systemctl enable otel-collector
+systemctl stop otel-collector
 systemctl start otel-collector
 
 echo "Otel-collector service started!"
