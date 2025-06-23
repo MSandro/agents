@@ -131,10 +131,10 @@ extensions:
 
 exporters:
   otlphttp/openobserve:
-    endpoint: https://observe.energy.at/api/IT/
+    endpoint: $URL
     headers:
       stream-name: windows
-      Authorization: "Basic cm9vdEBleGFtcGxlLmNvbTp3bUVlNWZxdDF5cGRtUVZT"
+      Authorization: "Basic $AUTH_KEY"
 
 service:
   extensions: [zpages]
