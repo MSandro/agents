@@ -13,7 +13,7 @@ if (-not $URL -or -not $AUTH_KEY) {
 # Detect the operating system and its architecture
 $OS = "windows"
 $ARCH = $ENV:PROCESSOR_ARCHITECTURE.ToLower()
-$OTEL_VERSION = "0.90.1"
+$OTEL_VERSION = "0.128.0"
 
 # architecture check
 $ARCH = if ($ARCH -eq "amd64") { "amd64" } elseif ($ARCH -eq "arm64") { "arm64" } elseif ($ARCH -eq "x86") { "386" } else { $ARCH }
@@ -63,7 +63,12 @@ receivers:
       network:
       paging:
       processes:
-      # process: # a bug in the process scraper causes the collector to throw errors so disabling it for now
+      process:
+        metrics:
+          process.cpu.utilization:
+            enabled: true
+          process.memory.utilization:
+            enabled: true
       
   windowsperfcounters/memory:
     metrics:
