@@ -100,7 +100,7 @@ receivers:
             metric: processor.time
             attributes: { state: active }
       - object: "Processor"
-        instances: ["1", "2"]        # ← Strings, nicht Integer!
+        instances: ["1", "2"]
         counters:
           - name: "% Idle Time"
             metric: processor.time
