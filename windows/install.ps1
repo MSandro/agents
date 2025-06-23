@@ -71,25 +71,25 @@ receivers:
             enabled: true
           process.memory.utilization:
             enabled: true
-      
+
   windowsperfcounters/memory:
+    collection_interval: 30s
     metrics:
       bytes.committed:
-        description: the number of bytes committed to memory
+        description: Number of bytes committed to memory
         unit: By
         gauge:
-    collection_interval: 30s
     perfcounters:
-      - object: Memory
+      - object: "Memory"
         counters:
-          - name: Committed Bytes
+          - name: "Committed Bytes"
             metric: bytes.committed
 
   windowsperfcounters/processor:
     collection_interval: 1m
     metrics:
       processor.time:
-        description: active and idle time of the processor
+        description: Active vs. idle CPU time
         unit: "%"
         gauge:
     perfcounters:
@@ -98,58 +98,60 @@ receivers:
         counters:
           - name: "% Processor Time"
             metric: processor.time
-            attributes:
-              state: active
+            attributes: { state: active }
       - object: "Processor"
-        instances: [1, 2]
+        instances: ["1", "2"]        # ← Strings, nicht Integer!
         counters:
           - name: "% Idle Time"
             metric: processor.time
-            attributes:
-              state: idle
-  windowseventlog/application:
-    channel: application
-  windowseventlog/security:
-    channel: security
-  windowseventlog/setup:
-    channel: setup
-  windowseventlog/system:
-    channel: system
+            attributes: { state: idle }
+
+  windowseventlog/application: { channel: application }
+  windowseventlog/security:    { channel: security }
+  windowseventlog/setup:       { channel: setup }
+  windowseventlog/system:      { channel: system }
+
 processors:
-  resourcedetection/system:
+  resourcedetection:
     detectors: ["system"]
     system:
       hostname_sources: ["os"]
+
   memory_limiter:
     check_interval: 1s
     limit_percentage: 75
     spike_limit_percentage: 15
+
   batch:
     send_batch_size: 10000
     timeout: 10s
 
 extensions:
   zpages: {}
-  memory_ballast:
-    size_mib: 512
 
 exporters:
   otlphttp/openobserve:
-    endpoint: $URL
+    endpoint: https://observe.energy.at/api/IT/
     headers:
       stream-name: windows
-      Authorization: "Basic $AUTH_KEY"
+      Authorization: "Basic cm9vdEBleGFtcGxlLmNvbTp3bUVlNWZxdDF5cGRtUVZT"
 
 service:
-  extensions: [zpages, memory_ballast]
+  extensions: [zpages]
   pipelines:
     metrics:
-      receivers: [windowsperfcounters/processor, windowsperfcounters/memory, hostmetrics]
-      processors: [resourcedetection/system, memory_limiter, batch]
+      receivers: [windowsperfcounters/processor,
+                  windowsperfcounters/memory,
+                  hostmetrics]
+      processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/openobserve]
+
     logs:
-      receivers: [windowseventlog/application,windowseventlog/security,windowseventlog/setup,windowseventlog/system]
-      processors: [resourcedetection/system, memory_limiter, batch]
+      receivers: [windowseventlog/application,
+                  windowseventlog/security,
+                  windowseventlog/setup,
+                  windowseventlog/system]
+      processors: [resourcedetection, memory_limiter, batch]
       exporters: [otlphttp/openobserve]
 "@
 
